@@ -1,6 +1,11 @@
 package com.star.samodelkin
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.Serializable
+import java.net.URL
+
+private const val CHARACTER_DATA_API = "https://chargen-api.herokuapp.com/"
 
 private fun <T> List<T>.rand() = shuffled().first()
 
@@ -35,4 +40,20 @@ object CharacterGenerator {
         dex = dex(),
         wis = wis(),
         str = str())
+
+    fun fromApiData(apiData: String): CharacterData {
+
+        val (race, name, dex, wis, str) = apiData.split(",")
+
+        return CharacterData(name, race, dex, wis, str)
+    }
+}
+
+suspend fun fetchCharacterData(): CharacterGenerator.CharacterData {
+
+    val apiData = withContext(Dispatchers.IO) {
+        URL(CHARACTER_DATA_API).readText()
+    }
+
+    return CharacterGenerator.fromApiData(apiData)
 }
