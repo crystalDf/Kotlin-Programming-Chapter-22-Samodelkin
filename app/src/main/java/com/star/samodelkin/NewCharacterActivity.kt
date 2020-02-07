@@ -15,7 +15,7 @@ private var Bundle.characterData
 
 class NewCharacterActivity : AppCompatActivity() {
 
-    private var characterData = CharacterGenerator.generate()
+    private lateinit var characterData: CharacterGenerator.CharacterData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +24,11 @@ class NewCharacterActivity : AppCompatActivity() {
 //        characterData = savedInstanceState?.let {
 //            it.getSerializable(CHARACTER_DATA_KEY) as CharacterGenerator.CharacterData
 //        } ?: CharacterGenerator.generate()
-        characterData = savedInstanceState?.characterData ?: CharacterGenerator.generate()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            characterData = savedInstanceState?.characterData ?: fetchCharacterData()
+            displayCharacterData()
+        }
 
         generateButton.setOnClickListener {
             GlobalScope.launch(Dispatchers.Main) {
@@ -32,8 +36,6 @@ class NewCharacterActivity : AppCompatActivity() {
                 displayCharacterData()
             }
         }
-
-        displayCharacterData()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
