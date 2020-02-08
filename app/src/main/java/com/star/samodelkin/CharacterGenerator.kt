@@ -51,9 +51,20 @@ object CharacterGenerator {
 
 suspend fun fetchCharacterData(): CharacterGenerator.CharacterData {
 
-    val apiData = withContext(Dispatchers.IO) {
-        URL(CHARACTER_DATA_API).readText()
+    var characterData: CharacterGenerator.CharacterData
+
+    while (true) {
+
+        val apiData = withContext(Dispatchers.IO) {
+            URL(CHARACTER_DATA_API).readText()
+        }
+
+        characterData = CharacterGenerator.fromApiData(apiData)
+
+        if (characterData.str.toInt() >= 10) {
+            break
+        }
     }
 
-    return CharacterGenerator.fromApiData(apiData)
+    return characterData
 }
